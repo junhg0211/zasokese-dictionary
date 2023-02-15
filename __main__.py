@@ -5,9 +5,18 @@ from os import mkdir
 from os.path import isfile, isdir
 
 import gspread
+from unidecode import unidecode
 
 CREDENTIAL_PATH = './secret/credential.json'
 ZASOSPIKA_DICTIONARY = '1QSqIbmShJiUiJWNB0x8dQzGbb6W1dqEz_LBlP363e_E'
+
+
+def normalise(string: str) -> str:
+    """
+    소문자화, 다이어크리틱 제거 등을 진행한다.
+    """
+
+    return unidecode(string).lower()
 
 
 class Dictionary:
@@ -60,9 +69,11 @@ class Dictionary:
         """
         단어의 ``self.data`` 상 인덱스 목록을 출력한다.
         """
+        query = normalise(query)
+
         result = list()
         for i, row in enumerate(self.data):
-            if any(query in datum for datum in row):
+            if any(query in normalise(datum) for datum in row):
                 result.append(i)
         return result
 
