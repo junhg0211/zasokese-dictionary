@@ -56,11 +56,28 @@ class Dictionary:
         with open(self.path, 'r', encoding='utf-8') as file:
             self.data = load(file)
 
+    def query(self, query: str, limit: int = 10) -> list[int]:
+        """
+        단어의 ``self.data`` 상 인덱스 목록을 출력한다.
+        """
+        result = list()
+        for i, row in enumerate(self.data):
+            if any(query in datum for datum in row):
+                result.append(i)
+        return result
+
+    def get(self, index: int) -> list:
+        return self.data[index]
+
 
 def main():
     dictionary = Dictionary()
 
-    print(dictionary)
+    query = input()
+    indexes = dictionary.query(query)
+
+    for index in indexes:
+        print(*dictionary.get(index), sep='\t')
 
 
 if __name__ == '__main__':
