@@ -3,9 +3,13 @@ from json import dump, load
 from json.decoder import JSONDecodeError
 from os import mkdir
 from os.path import isfile, isdir
+from sys import stdout
 
 import gspread
+from readchar import readchar
 from unidecode import unidecode
+
+import textfield
 
 CREDENTIAL_PATH = './secret/credential.json'
 ZASOSPIKA_DICTIONARY = '1QSqIbmShJiUiJWNB0x8dQzGbb6W1dqEz_LBlP363e_E'
@@ -84,11 +88,40 @@ class Dictionary:
 def main():
     dictionary = Dictionary()
 
-    query = input()
-    indexes = dictionary.query(query)
+    buffer = ''
 
-    for index in indexes:
-        print(*dictionary.get(index), sep='\t')
+    textfield.clear()
+
+    while True:
+        try:
+            c = readchar()
+        except KeyboardInterrupt:
+            break
+
+        if c == '\x7f':
+            buffer = buffer[:-1]
+        elif c == '\x15':
+            buffer = ''
+        elif c == '\n':
+            pass
+        else:
+            buffer += c
+
+        textfield.clear()
+
+        textfield.clear_line(1)
+        stdout.write('\r' + buffer)
+
+        if not buffer:
+            continue
+
+        indexes = dictionary.query(buffer)
+        print(buffer)
+        for i, index in enumerate(indexes):
+            textfield.move(i+2)
+            data = dictionary.get(index)
+
+            stdout.write(data[0])
 
 
 if __name__ == '__main__':
